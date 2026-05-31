@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer, Bounce } from "react-toastify"; // ✅ import Bounce
