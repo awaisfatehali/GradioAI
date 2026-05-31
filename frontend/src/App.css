@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import "tailwindcss";
+
+.typing-text {
+  display: inline-block;
+  animation: typing 3s steps(30, end) infinite, blink 0.6s infinite step-end alternate;
+}
+.typing-text1 {
+  display: inline-block;
+  animation: typing1 3s steps(30, end) infinite, blink 0.6s infinite step-end alternate;
+}
+
+@keyframes typing {
+  0% {
+    width: 0;
+  }
+  40% {
+    width: 50%;
+  }
+  60% {
+    width: 50%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+@keyframes typing1 {
+  0% {
+    width: 0;
+  }
+  40% {
+    width: 40%;
+  }
+  60% {
+    width: 40%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes blink1 {
+  50% {
+    border-color: transparent;
+  }
+}
