@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Verify from "../components/verify";
+import Verify from "../components/Verify";
 import NotVerify from "../components/NotVerify";
 import axios from "axios";
 import { useParams } from "react-router-dom";
