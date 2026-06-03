@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
-const { PDFParse } = require("pdf-parse"); // ✅ v2 import
+const pdfParse = require("pdf-parse");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
 const { upload } = require("../multer");
@@ -31,13 +31,12 @@ router.post(
         const filePath = file.path;
         const fileBuffer = fs.readFileSync(filePath);
 
-        // ✅ PDF-Parse v2
+        const firstBytes = fs.readFileSync(filePath).slice(0, 20);
+        
         let extractedText = "";
         try {
-          const parser = new PDFParse({ data: fileBuffer });
-          const pdfResult = await parser.getText();
+          const pdfResult = await pdfParse(fileBuffer);
           extractedText = pdfResult.text;
-          await parser.destroy(); // free memory
         } catch (err) {
           console.error(`Error parsing PDF ${file.originalname}:`, err);
 

@@ -4,6 +4,188 @@ import { Backend_url } from "../server";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const Styles = () => (
+  <style>{`
+    @keyframes clCardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes clModalIn {
+      from { opacity: 0; transform: scale(.96) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ── Card ── */
+    .cl-card {
+      position: relative;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 22px 18px;
+      display: flex; flex-direction: column; gap: 14px;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      animation: clCardIn .35s ease both;
+      min-height: 160px;
+    }
+    .cl-card:hover {
+      border-color: var(--gold-dim);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    }
+    /* gold top accent on hover */
+    .cl-card::before {
+      content: '';
+      position: absolute; top: 0; left: 20px; right: 20px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      border-radius: 2px;
+      opacity: 0; transition: opacity .25s;
+    }
+    .cl-card:hover::before { opacity: 1; }
+
+    /* ── Delete btn ── */
+    .cl-del-btn {
+      position: absolute; top: 14px; right: 14px;
+      width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .2s, color .2s, border-color .2s;
+    }
+    .cl-del-btn:hover {
+      background: rgba(192,57,43,.1);
+      border-color: rgba(192,57,43,.35);
+      color: #c0392b;
+    }
+
+    /* ── Icon + title ── */
+    .cl-card-top {
+      display: flex; align-items: center; gap: 14px;
+      padding-right: 30px;
+    }
+    .cl-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(201,168,76,.08);
+      border: 1px solid rgba(201,168,76,.15);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .2s, border-color .2s;
+    }
+    .cl-card:hover .cl-icon {
+      background: rgba(201,168,76,.15);
+      border-color: rgba(201,168,76,.3);
+    }
+
+    .cl-card-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 3px;
+    }
+    .cl-card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px; color: var(--text);
+      letter-spacing: -.2px; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 160px;
+    }
+
+    /* ── Divider ── */
+    .cl-divider {
+      height: 1px; background: var(--border);
+    }
+
+    /* ── Description ── */
+    .cl-desc {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: var(--muted);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── Footer ── */
+    .cl-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: auto;
+    }
+    .cl-footer-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted); opacity: .5;
+    }
+    .cl-arrow-btn {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: rgba(201,168,76,.08);
+      border: 1px solid rgba(201,168,76,.15);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s, border-color .2s;
+      text-decoration: none;
+    }
+    .cl-card:hover .cl-arrow-btn {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .cl-card:hover .cl-arrow-icon { stroke: #0f0f0f; }
+    .cl-arrow-icon { stroke: var(--gold); transition: stroke .2s; }
+
+    /* ── Confirm modal overlay ── */
+    .cl-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .cl-confirm {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px 28px;
+      width: 100%; max-width: 360px;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      animation: clModalIn .28s cubic-bezier(.22,.61,.36,1) both;
+    }
+    .cl-confirm-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(192,57,43,.1);
+      border: 1px solid rgba(192,57,43,.2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cl-confirm-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: var(--text); text-align: center;
+    }
+    .cl-confirm-desc {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px; color: var(--muted);
+      text-align: center; line-height: 1.6;
+    }
+    .cl-confirm-desc strong { color: var(--gold); font-weight: 600; }
+    .cl-confirm-actions {
+      display: flex; gap: 10px; width: 100%; margin-top: 4px;
+    }
+    .cl-btn-cancel {
+      flex: 1; padding: 10px;
+      background: transparent;
+      border: 1px solid var(--border); border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--muted);
+      cursor: pointer; transition: border-color .2s, color .2s;
+    }
+    .cl-btn-cancel:hover { border-color: var(--gold-dim); color: var(--text); }
+    .cl-btn-delete {
+      flex: 1; padding: 10px;
+      background: rgba(192,57,43,.15);
+      border: 1px solid rgba(192,57,43,.3); border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+      color: #c0392b;
+      cursor: pointer; transition: background .2s;
+    }
+    .cl-btn-delete:hover { background: rgba(192,57,43,.25); }
+  `}</style>
+);
+
 const ClassCard = ({ title, description, id, onClick }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -21,141 +203,74 @@ const ClassCard = ({ title, description, id, onClick }) => {
 
   return (
     <>
-      {/* Confirmation Popup */}
+      <Styles />
+
+      {/* ── Confirm modal ── */}
       {showConfirm && (
-        <div
-          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-          onClick={() => setShowConfirm(false)}
-        >
-          <div
-            className="bg-white rounded-2xl p-7 shadow-xl flex flex-col items-center gap-4 w-[320px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                />
+        <div className="cl-overlay" onClick={() => setShowConfirm(false)}>
+          <div className="cl-confirm" onClick={(e) => e.stopPropagation()}>
+            <div className="cl-confirm-icon">
+              <svg width="20" height="20" fill="none" stroke="#c0392b" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-[#2d0066] text-center">
-              Delete Class?
-            </h3>
-            <p className="text-sm text-[#450693]/60 text-center">
-              Are you sure you want to delete{" "}
-              <span className="font-semibold text-[#450693]">{title}</span>? This
-              will also delete all its assignments.
+            <h3 className="cl-confirm-title">Delete Class?</h3>
+            <p className="cl-confirm-desc">
+              This will permanently delete <strong>{title}</strong> and all its assignments. This cannot be undone.
             </p>
-            <div className="flex gap-3 w-full mt-1">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="flex-1 py-2 rounded-xl border border-[#450693]/20 text-[#450693] font-semibold text-sm hover:bg-[#f4f0ff] transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold text-sm transition-all"
-              >
-                Delete
-              </button>
+            <div className="cl-confirm-actions">
+              <button className="cl-btn-cancel" onClick={() => setShowConfirm(false)}>Cancel</button>
+              <button className="cl-btn-delete" onClick={handleDelete}>Delete</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Card — unchanged */}
-      <div className="group relative bg-white border border-[#450693]/10 hover:border-[#450693]/35 hover:shadow-lg rounded-3xl p-7 flex flex-col gap-4 cursor-pointer transition-all duration-200 min-h-[160px] justify-center">
-        {/* Delete Button */}
+      {/* ── Card ── */}
+      <div className="cl-card" onClick={onClick}>
+        {/* Delete btn */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowConfirm(true);
-          }}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-red-50 hover:bg-[#450693] flex items-center justify-center transition-all duration-200"
+          className="cl-del-btn"
+          onClick={(e) => { e.stopPropagation(); setShowConfirm(true); }}
+          title="Delete class"
         >
-          <svg
-            className="w-4 h-4 text-[#450693] hover:text-white"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.5}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 6l12 12M18 6L6 18"
-            />
+          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
           </svg>
         </button>
 
-        {/* Icon + Title row */}
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#ede7ff] rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#450693] transition-all duration-200">
-            <svg
-              className="w-6 h-6 text-[#450693] group-hover:text-white transition-all duration-200"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-              />
+        {/* Icon + title */}
+        <div className="cl-card-top">
+          <div className="cl-icon">
+            <svg width="18" height="18" fill="none" stroke="#c9a84c" strokeWidth="1.8" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
             </svg>
           </div>
-
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-[#450693]/45 uppercase tracking-widest mb-0.5">
-              Class Name
-            </p>
-            <h2 className="text-base font-bold text-[#2d0066] truncate">
-              {title}
-            </h2>
+          <div style={{ minWidth: 0 }}>
+            <p className="cl-card-label">Class</p>
+            <h2 className="cl-card-title" title={title}>{title}</h2>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-[#450693]/8" />
+        <div className="cl-divider" />
 
         {/* Description */}
-        <p className="text-sm text-[#450693]/60 leading-relaxed line-clamp-2">
-          {description}
-        </p>
+        <p className="cl-desc">{description}</p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between mt-1">
-          <span className="text-xs font-semibold text-[#450693]/40">
-            Click to open
-          </span>
-
-          <div className="w-7 h-7 rounded-full bg-[#f4f0ff] group-hover:bg-[#450693] flex items-center justify-center transition-all duration-200">
-            <Link to={`/classeview/${id}`}>
-              <svg
-                className="w-3.5 h-3.5 text-[#450693] group-hover:text-white transition-all duration-200"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                />
-              </svg>
-            </Link>
-          </div>
+        <div className="cl-footer">
+          <span className="cl-footer-hint">Open class</span>
+          <Link
+            to={`/classeview/${id}`}
+            className="cl-arrow-btn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <svg width="13" height="13" fill="none" strokeWidth="2.5" viewBox="0 0 24 24" className="cl-arrow-icon">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
         </div>
       </div>
     </>

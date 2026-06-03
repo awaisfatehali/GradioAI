@@ -1,17 +1,16 @@
 import React, { useEffect } from "react";
 import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
-import Dashboard from "../components/DashBoard.jsx"
+import Dashboard from "../components/DashBoard.jsx";
 
 const DashBoardPage = () => {
-    useEffect(() => {
-  window.scrollTo(0, 0);
-}, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <div>
+    <div style={{ background: "#0f0f0f", minHeight: "100vh" }}>
       <NavBar active={2} />
-      <Dashboard/>
+      <Dashboard />
     </div>
   );
 };
