@@ -14,7 +14,7 @@ app.use("/",express.static("uploads"));
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://gradio-ai-j8m7.vercel.app",
     credentials: true,
   })
 );
